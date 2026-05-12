@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jeeves — Office Rotation</title>
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+/* ── JEEVES BRAND TOKENS ── */
+:root {
+  --black:          #0A0A0C;
+  --black-2:        #111116;
+  --black-3:        #18181F;
+  --black-4:        #22222B;
+  --gold:           #C9A84C;
+  --gold-light:     #E2C97E;
+  --gold-dim:       rgba(201,168,76,0.15);
+  --gold-border:    rgba(201,168,76,0.25);
+  --pacific:        #51ACBC;
+  --pacific-dim:    rgba(81,172,188,0.15);
+  --pacific-border: rgba(81,172,188,0.25);
+  --powder:         #C1DDD8;
+  --white:          #FFFFFF;
+  --text-primary:   #F0EDE6;
+  --text-secondary: #9A9690;
+  --text-muted:     #5A5755;
+  --red:            #E05555;
+  --red-dim:        rgba(224,85,85,0.15);
+  --amber:          #D4914A;
+  --amber-dim:      rgba(212,145,74,0.15);
+  --green:          #4ABCA0;
+  --green-dim:      rgba(74,188,160,0.15);
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:'Urbanist',-apple-system,sans-serif;
+  background:var(--black);
+  color:var(--text-primary);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+
+/* ── TAB NAV ── */
+.tab-nav{
+  position:sticky; top:0; z-index:100;
+  background:var(--black-2);
+  border-bottom:1px solid var(--black-4);
+  display:flex; align-items:center;
+  padding:0 40px;
+  box-shadow:0 2px 12px rgba(0,0,0,.4);
+}
+.tab-logo{ display:flex; align-items:center; gap:9px; margin-right:32px; padding:14px 0; }
+.tab-logo-box{
+  width:28px; height:28px; background:var(--gold);
+  border-radius:7px; display:flex; align-items:center; justify-content:center;
+  font-size:.8rem; font-weight:900; color:var(--black); flex-shrink:0;
+}
+.tab-logo-name{ font-size:.88rem; font-weight:700; letter-spacing:0.06em; color:var(--text-primary); }
+.tab-btn{
+  padding:16px 20px; font-size:.82rem; font-weight:600;
+  color:var(--text-muted); background:none; border:none;
+  border-bottom:2px solid transparent; cursor:pointer;
+  letter-spacing:0.04em; transition:color .15s, border-color .15s;
+  font-family:inherit;
+}
+.tab-btn:hover{ color:var(--text-secondary); }
+.tab-btn.active{ color:var(--gold); border-bottom-color:var(--gold); }
+
+/* ── TAB PANELS ── */
+.tab-panel{ display:none; }
+.tab-panel.active{ display:block; }
+
+/* ══════════════════════════════════════════
+   PROPOSAL STYLES
+══════════════════════════════════════════ */
+.header{
+  position:relative; overflow:hidden;
+  background:var(--black);
+  padding:52px 56px 44px;
+  border-bottom:1px solid var(--black-4);
+}
+.header::before{
+  content:''; position:absolute; top:-80px; right:-80px;
+  width:500px; height:500px;
+  background:radial-gradient(circle,rgba(201,168,76,0.13) 0%,transparent 65%);
+  pointer-events:none;
+}
+.header-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; }
+.header-date{ font-size:11px; font-weight:600; letter-spacing:0.10em; text-transform:uppercase; color:var(--text-muted); }
+.header-title{ font-size:2.4rem; font-weight:800; color:var(--text-primary); line-height:1.15; margin-bottom:10px; }
+.header-title span{ color:var(--gold); }
+.header-sub{ font-size:1rem; color:var(--text-secondary); max-width:540px; line-height:1.6; }
+.btn-reserve-link{
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--gold); color:var(--black); text-decoration:none;
+  font-size:.85rem; font-weight:700; padding:10px 20px;
+  border-radius:8px; letter-spacing:0.04em;
+  border:none; cursor:pointer; font-family:inherit;
+  transition:background .15s;
+}
+.btn-reserve-link:hover{ background:var(--gold-light); }
+
+.section{ padding:44px 56px; border-bottom:1px solid var(--black-4); }
+.section-label{
+  font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--text-muted); margin-bottom:24px;
+}
+
+/* KPI */
+.kpi-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+@media(max-width:900px){ .kpi-grid{ grid-template-columns:repeat(2,1fr); } }
+.kpi-card{
+  background:var(--black-2); border:1px solid var(--black-4);
+  border-radius:12px; padding:24px;
+  position:relative; overflow:hidden;
+}
+.kpi-card::after{
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  border-radius:12px 12px 0 0;
+}
+.kpi-card.gold-top::after   { background:var(--gold); }
+.kpi-card.green-top::after  { background:var(--green); }
+.kpi-card.pacific-top::after{ background:var(--pacific); }
+.kpi-card.amber-top::after  { background:var(--amber); }
+.kpi-label{ font-size:10px; font-weight:600; letter-spacing:0.10em; text-transform:uppercase; color:var(--text-muted); margin-bottom:12px; }
+.kpi-value{ font-size:2.2rem; font-weight:800; margin-bottom:4px; }
+.kpi-sub  { font-size:.75rem; color:var(--text-secondary); line-height:1.5; }
+.kpi-val-gold   { color:var(--gold); }
+.kpi-val-green  { color:var(--green); }
+.kpi-val-pacific{ color:var(--pacific); }
+.kpi-val-amber  { color:var(--amber); }
+
+/* Calendar / week grid */
+.week-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+@media(max-width:800px){ .week-grid{ grid-template-columns:repeat(2,1fr); } }
+.p-day-card{
+  background:var(--black-2); border:1px solid var(--black-4);
+  border-radius:12px; overflow:hidden;
+}
+.p-day-card.remote{ opacity:.55; }
+.p-day-hdr{ padding:14px 16px 10px; }
+.p-day-name{ font-size:.72rem; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:var(--text-muted); margin-bottom:2px; }
+.p-day-type{ font-size:1rem; font-weight:700; color:var(--text-primary); }
+.p-day-tag{
+  display:inline-block; font-size:9px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+  padding:2px 7px; border-radius:20px; margin-top:6px;
+}
+.tag-allhands { background:var(--gold-dim);    color:var(--gold); }
+.tag-groupa   { background:var(--pacific-dim); color:var(--pacific); }
+.tag-groupb   { background:var(--green-dim);   color:var(--green); }
+.tag-remote   { background:var(--black-3);     color:var(--text-muted); }
+.p-day-divider{ height:1px; background:var(--black-4); margin:0 16px; }
+.p-day-body{ padding:14px 16px; }
+.p-people-group{ margin-bottom:10px; }
+.p-people-group:last-child{ margin-bottom:0; }
+.p-group-label{
+  font-size:9px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase;
+  color:var(--text-muted); margin-bottom:6px;
+}
+.p-person-pill{
+  display:inline-flex; align-items:center; gap:5px;
+  background:var(--black-3); border:1px solid var(--black-4);
+  border-radius:6px; padding:3px 8px; font-size:.72rem;
+  color:var(--text-secondary); margin:2px 2px 2px 0;
+}
+.dot{ width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.dot-gold   { background:var(--gold); }
+.dot-pacific{ background:var(--pacific); }
+.dot-green  { background:var(--green); }
+.dot-amber  { background:var(--amber); }
+.dot-powder { background:var(--powder); }
+.dot-muted  { background:var(--text-muted); }
+.p-seat-bar-wrap{ padding:0 16px 14px; }
+.p-seat-bar-track{ background:var(--black-3); border-radius:99px; height:5px; overflow:hidden; }
+.p-seat-bar-fill{ height:100%; border-radius:99px; }
+.p-seat-bar-lbl{ font-size:.68rem; color:var(--text-muted); margin-top:5px; display:flex; justify-content:space-between; }
+
+.p-footer{
+  text-align:center; padding:32px;
+  font-size:11px; color:var(--text-muted);
+  border-top:1px solid var(--black-4);
+  letter-spacing:0.06em;
+}
+.p-footer strong{ color:var(--text-secondary); }
+
+/* ══════════════════════════════════════════
+   RESERVATION APP STYLES
+══════════════════════════════════════════ */
+.app-wrap{ max-width:1100px; margin:0 auto; padding:36px 24px 60px; }
+.app-section-title{
+  font-size:1.1rem; font-weight:700; color:var(--text-primary);
+  margin-bottom:20px; display:flex; align-items:center; gap:10px;
+}
+
+/* Reserve card */
+.res-card{
+  background:var(--black-2); border:1px solid var(--black-4);
+  border-radius:14px; padding:24px; margin-bottom:28px;
+}
+
+/* Mini calendar */
+.cal-outer{ display:flex; gap:24px; flex-wrap:wrap; align-items:flex-start; }
+.mini-cal{
+  background:var(--black-3); border:1px solid var(--black-4);
+  border-radius:12px; padding:16px; min-width:260px;
+}
+.cal-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.cal-header button{
+  background:none; border:none; cursor:pointer;
+  font-size:1rem; color:var(--gold); padding:3px 8px;
+  border-radius:6px; font-family:inherit;
+}
+.cal-header button:hover{ background:var(--black-4); }
+.cal-header span{ font-weight:700; font-size:.9rem; color:var(--text-primary); }
+.cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:3px; text-align:center; }
+.cal-dow{ font-size:.65rem; font-weight:700; color:var(--text-muted); padding-bottom:5px; text-transform:uppercase; }
+.cal-day{
+  font-size:.8rem; padding:6px 2px; border-radius:7px;
+  cursor:pointer; transition:background .12s,color .12s; position:relative;
+  color:var(--text-secondary);
+}
+.cal-day:hover:not(.cal-empty):not(.cal-disabled){ background:var(--black-4); }
+.cal-day.cal-empty{ cursor:default; }
+.cal-day.cal-disabled{ color:var(--text-muted); cursor:default; }
+.cal-day.cal-today{ font-weight:700; color:var(--gold); }
+.cal-day.cal-selected{ background:var(--gold); color:var(--black); font-weight:700; }
+.cal-day.cal-has-slot::after{
+  content:''; display:block; width:4px; height:4px; border-radius:50%;
+  background:var(--pacific); margin:2px auto 0;
+}
+.cal-day.cal-selected::after{ background:rgba(0,0,0,.4); }
+.cal-day.cal-full::after{ background:var(--red); }
+.sel-date-label{ font-size:.78rem; color:var(--text-muted); margin-top:8px; text-align:center; min-height:18px; }
+
+/* Form */
+.form-side{ display:flex; flex-direction:column; gap:12px; flex:1; min-width:220px; }
+.form-grp{ display:flex; flex-direction:column; gap:4px; }
+.form-grp label{ font-size:.75rem; font-weight:600; color:var(--text-muted); letter-spacing:0.06em; text-transform:uppercase; }
+.form-grp input{
+  background:var(--black-3); border:1px solid var(--black-4);
+  border-radius:8px; padding:9px 12px; font-size:.88rem;
+  color:var(--text-primary); outline:none; font-family:inherit;
+  transition:border .15s;
+}
+.form-grp input:focus{ border-color:var(--gold); }
+.form-grp input::placeholder{ color:var(--text-muted); }
+.slot-info{
+  background:var(--black-3); border:1px solid var(--black-4);
+  border-radius:8px; padding:10px 12px; font-size:.8rem;
+  color:var(--text-muted); min-height:40px;
+}
+.slot-info.full{ background:var(--red-dim); border-color:rgba(224,85,85,.3); color:var(--red); font-weight:600; }
+.slot-info.good{ background:var(--green-dim); border-color:rgba(74,188,160,.3); color:var(--green); }
+.btn-res{
+  background:var(--gold); color:var(--black); border:none;
+  border-radius:8px; padding:11px 22px; font-size:.88rem;
+  font-weight:700; cursor:pointer; font-family:inherit;
+  transition:background .15s; margin-top:2px;
+}
+.btn-res:hover:not(:disabled){ background:var(--gold-light); }
+.btn-res:disabled{ background:var(--black-4); color:var(--text-muted); cursor:not-allowed; }
+
+/* Week nav */
+.week-nav{ display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+.week-nav button{
+  background:var(--black-2); border:1px solid var(--black-4);
+  border-radius:8px; padding:7px 16px; cursor:pointer;
+  font-size:.82rem; color:var(--text-secondary); font-weight:600;
+  font-family:inherit; transition:border-color .15s;
+}
+.week-nav button:hover{ border-color:var(--gold); color:var(--gold); }
+.week-label{ font-size:.95rem; font-weight:600; color:var(--text-primary); }
+
+/* Legend */
+.legend{ display:flex; gap:16px; flex-wrap:wrap; font-size:.75rem; color:var(--text-muted); margin-bottom:16px; }
+.legend-item{ display:flex; align-items:center; gap:5px; }
+.legend-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+/* Day cards */
+.days-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+@media(max-width:860px){ .days-grid{ grid-template-columns:repeat(2,1fr); } }
+@media(max-width:480px){ .days-grid{ grid-template-columns:1fr; } }
+
+.r-day-card{
+  background:var(--black-2); border:1px solid var(--black-4);
+  border-radius:12px; overflow:hidden; transition:border-color .2s;
+}
+.r-day-card.highlighted{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold-border); }
+
+.r-day-hdr{ padding:12px 14px 8px; display:flex; justify-content:space-between; align-items:center; }
+.r-day-hdr h2{ font-size:.9rem; font-weight:700; color:var(--text-primary); }
+.r-dtag{
+  font-size:.65rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+  padding:2px 7px; border-radius:20px;
+}
+.hdr-a .r-dtag { background:var(--pacific-dim); color:var(--pacific); }
+.hdr-b .r-dtag { background:var(--green-dim);   color:var(--green); }
+.hdr-ab .r-dtag{ background:var(--gold-dim);    color:var(--gold); }
+.hdr-remote .r-dtag{ background:var(--black-3); color:var(--text-muted); }
+.hdr-remote h2{ color:var(--text-muted); }
+
+.r-date-sub{ font-size:.68rem; color:var(--text-muted); padding:0 14px 6px; display:flex; justify-content:space-between; }
+
+.r-seat-bar{ margin:0 14px 8px; }
+.r-seat-bar-track{ background:var(--black-3); border-radius:99px; height:4px; overflow:hidden; }
+.r-seat-bar-fill{ height:100%; border-radius:99px; transition:width .4s; }
+.r-seat-bar-label{ font-size:.65rem; color:var(--text-muted); margin-top:3px; }
+
+.r-people-list{ padding:4px 14px 12px; }
+.r-section-lbl{
+  font-size:.62rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:0.08em; color:var(--text-muted); margin:8px 0 4px;
+}
+.r-person-chip{
+  display:flex; align-items:center; gap:6px;
+  padding:4px 0; border-bottom:1px solid var(--black-3);
+  font-size:.78rem;
+}
+.r-person-chip:last-child{ border-bottom:none; }
+.r-avatar{
+  width:22px; height:22px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.58rem; font-weight:700; color:var(--black); flex-shrink:0;
+}
+.av-gold   { background:var(--gold); }
+.av-pacific{ background:var(--pacific); }
+.av-green  { background:var(--green); }
+.av-amber  { background:var(--amber); }
+.av-powder { background:var(--powder); }
+.av-muted  { background:var(--text-muted); }
+.av-purple { background:#7C3AED; }
+.r-person-name{ flex:1; color:var(--text-secondary); }
+.r-role-badge{
+  font-size:.62rem; background:var(--black-3); border:1px solid var(--black-4);
+  border-radius:99px; padding:1px 6px; color:var(--text-muted);
+}
+
+.res-chip{
+  display:flex; align-items:center; gap:6px;
+  padding:5px 8px; background:var(--pacific-dim);
+  border:1px solid var(--pacific-border); border-radius:8px;
+  margin-bottom:4px; font-size:.78rem;
+}
+.cancel-btn{
+  margin-left:auto; background:none; border:none; cursor:pointer;
+  color:var(--text-muted); font-size:.9rem; padding:0 2px;
+}
+.cancel-btn:hover{ color:var(--red); }
+.empty-res{ font-size:.72rem; color:var(--text-muted); text-align:center; margin-top:6px; }
+
+/* Toast */
+.toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  background:var(--black-2); border:1px solid var(--gold-border);
+  color:var(--text-primary); padding:10px 22px; border-radius:99px;
+  font-size:.84rem; font-weight:600; box-shadow:0 4px 20px rgba(0,0,0,.4);
+  opacity:0; pointer-events:none; transition:opacity .3s; z-index:999; white-space:nowrap;
+}
+.toast.show{ opacity:1; }
+.toast.err{ background:var(--red-dim); border-color:rgba(224,85,85,.3); color:var(--red); }
+</style>
+</head>
+<body>
+
+<!-- ── TAB NAV ── -->
+<nav class="tab-nav">
+  <div class="tab-logo">
+    <div class="tab-logo-box">J</div>
+    <span class="tab-logo-name">Jeeves</span>
+  </div>
+  <button class="tab-btn active" onclick="switchTab('proposal')">📋 Proposal</button>
+  <button class="tab-btn" onclick="switchTab('app')">📅 Reserve a Seat</button>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     TAB 1 — PROPOSAL
+══════════════════════════════════════════ -->
+<div id="tab-proposal" class="tab-panel active">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <span class="header-date">May 2026</span>
+  </div>
+  <h1 class="header-title">Office Rotation<br/><span>Proposal</span></h1>
+  <p class="header-sub">A structured two-day schedule that gives every team member a guaranteed seat, aligns with how Colombia and Mexico already operate, and keeps room for future hires.</p>
+  <div style="margin-top:24px;">
+    <button class="btn-reserve-link" onclick="switchTab('app')">📅 Reserve a Seat</button>
+  </div>
+</div>
+
+<!-- KPI ROW -->
+<div class="section">
+  <div class="section-label">At a glance</div>
+  <div class="kpi-grid">
+    <div class="kpi-card gold-top">
+      <div class="kpi-label">Office days / person</div>
+      <div class="kpi-value kpi-val-gold">2</div>
+      <div class="kpi-sub">Down from 3 — fewer days,<br/>more structured overlap</div>
+    </div>
+    <div class="kpi-card green-top">
+      <div class="kpi-label">Sales All-Hands day</div>
+      <div class="kpi-value kpi-val-green">Tue</div>
+      <div class="kpi-sub">All 18 people in simultaneously.<br/>Full team, every week.</div>
+    </div>
+    <div class="kpi-card pacific-top">
+      <div class="kpi-label">Total seats</div>
+      <div class="kpi-value kpi-val-pacific">18</div>
+      <div class="kpi-sub">Always at or under capacity.<br/>No scramble for desks.</div>
+    </div>
+    <div class="kpi-card amber-top">
+      <div class="kpi-label">Remote days</div>
+      <div class="kpi-value kpi-val-amber">Mon+Fri</div>
+      <div class="kpi-sub">Full team remote.</div>
+    </div>
+  </div>
+</div>
+
+<!-- WEEKLY SCHEDULE -->
+<div class="section">
+  <div class="section-label">Weekly schedule</div>
+  <div class="week-grid">
+
+    <!-- MON/FRI -->
+    <div class="p-day-card remote">
+      <div class="p-day-hdr">
+        <div class="p-day-name">Monday &amp; Friday</div>
+        <div class="p-day-type">Remote Days</div>
+        <span class="p-day-tag tag-remote">No office</span>
+      </div>
+      <div class="p-day-divider"></div>
+      <div class="p-day-body">
+        <p style="font-size:.75rem;color:var(--text-muted);line-height:1.6;">Full team remote as usual. If the team grows, we can easily reorganize the rotation.</p>
+      </div>
+      <div class="p-seat-bar-wrap">
+        <div class="p-seat-bar-track"><div class="p-seat-bar-fill" style="width:0%;background:var(--text-muted);"></div></div>
+        <div class="p-seat-bar-lbl"><span>0 / 18 seats</span><span>Remote</span></div>
+      </div>
+    </div>
+
+    <!-- TUESDAY -->
+    <div class="p-day-card">
+      <div class="p-day-hdr">
+        <div class="p-day-name">Tuesday</div>
+        <div class="p-day-type">Sales All-Hands ⭐</div>
+        <span class="p-day-tag tag-allhands">16 in office</span>
+      </div>
+      <div class="p-day-divider"></div>
+      <div class="p-day-body">
+        <div class="p-people-group">
+          <div class="p-group-label">Pod 1</div>
+          <span class="p-person-pill"><span class="dot dot-gold"></span>Mauricio</span>
+          <span class="p-person-pill"><span class="dot dot-gold"></span>Jorge</span>
+          <span class="p-person-pill"><span class="dot dot-gold"></span>Nathalia</span>
+        </div>
+        <div class="p-people-group">
+          <div class="p-group-label">Pod 2</div>
+          <span class="p-person-pill"><span class="dot dot-pacific"></span>Angelo</span>
+          <span class="p-person-pill"><span class="dot dot-pacific"></span>Vytor</span>
+          <span class="p-person-pill"><span class="dot dot-pacific"></span>João Victor</span>
+        </div>
+        <div class="p-people-group">
+          <div class="p-group-label">Pod 3</div>
+          <span class="p-person-pill"><span class="dot dot-green"></span>Vitor N.</span>
+          <span class="p-person-pill"><span class="dot dot-green"></span>Mathias</span>
+          <span class="p-person-pill"><span class="dot dot-green"></span>Bruno</span>
+        </div>
+        <div class="p-people-group">
+          <div class="p-group-label">Pod 4</div>
+          <span class="p-person-pill"><span class="dot dot-amber"></span>Liana</span>
+          <span class="p-person-pill"><span class="dot dot-amber"></span>TBH</span>
+          <span class="p-person-pill"><span class="dot dot-amber"></span>Willian</span>
+        </div>
+        <div class="p-people-group">
+          <div class="p-group-label">KAMs</div>
+          <span class="p-person-pill"><span class="dot dot-powder"></span>Igor</span>
+          <span class="p-person-pill"><span class="dot dot-powder"></span>Vinicius G.</span>
+          <span class="p-person-pill"><span class="dot dot-powder"></span>Gustavo</span>
+        </div>
+        <div class="p-people-group">
+          <div class="p-group-label">Distributed</div>
+          <span class="p-person-pill"><span class="dot dot-muted"></span>Sales Mgr</span>
+          <span class="p-person-pill"><span class="dot dot-muted"></span>Guga</span>
+        </div>
+        <div style="margin-top:12px;background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:8px;padding:8px 12px;">
+          <span style="font-size:.72rem;font-weight:700;color:var(--gold);">🚫 No visitors — Sales Day</span>
+          <p style="font-size:.72rem;color:var(--text-muted);margin-top:3px;line-height:1.5;">Reserved for the full sales team meeting. No external guests or occasional visitors on this day.</p>
+        </div>
+      </div>
+      <div class="p-seat-bar-wrap">
+        <div class="p-seat-bar-track"><div class="p-seat-bar-fill" style="width:89%;background:var(--gold);"></div></div>
+        <div class="p-seat-bar-lbl"><span>16 / 18 seats</span><span style="color:var(--gold)">2 open</span></div>
+      </div>
+    </div>
+
+    <!-- WEDNESDAY -->
+    <div class="p-day-card">
+      <div class="p-day-hdr">
+        <div class="p-day-name">Wednesday</div>
+        <div class="p-day-type">Group A+B</div>
+        <span class="p-day-tag tag-groupa">13 fixed · 5 open</span>
+      </div>
+      <div class="p-day-divider"></div>
+      <div class="p-day-body">
+        <div class="p-people-group">
+          <div class="p-group-label">Pod 1</div>
+          <span class="p-person-pill"><span class="dot dot-gold"></span>Mauricio</span>
+          <span class="p-person-pill"><span class="dot dot-gold"></span>Jorge</span>
+          <span class="p-person-pill"><span class="dot dot-gold"></span>Nathalia</span>
+        </div>
+        <div class="p-people-group">
+          <div class="p-group-label">Pod 4</div>
+          <span class="p-person-pill"><span class="dot dot-amber"></span>Liana</span>
+          <span class="p-person-pill"><span class="dot dot-amber"></span>TBH</span>
+          <span class="p-person-pill"><span class="dot dot-amber"></span>Willian</span>
+        </div>
+        <div class="p-people-group">
+          <div class="p-group-label">KAMs</div>
+          <span class="p-person-pill"><span class="dot dot-powder"></span>Igor</span>
+          <span class="p-person-pill"><span class="dot dot-powder"></span>Vinicius G.</span>
+          <span class="p-person-pill"><span class="dot dot-powder"></span>Gustavo</span>
+        </div>
+        <div class="p-people-group">
+          <div class="p-group-label">Distributed</div>
+          <span class="p-person-pill"><span class="dot dot-muted"></span>Leticia</span>
+          <span class="p-person-pill"><span class="dot dot-muted"></span>William F.</span>
+          <span class="p-person-pill"><span class="dot dot-muted"></span>Sales Mgr</span>
+          <span class="p-person-pill"><span class="dot dot-muted"></span>Guga</span>
+        </div>
+        <div class="p-people-group">
+          <div class="p-group-label" style="color:var(--pacific);">Visitors (open)</div>
+          <span style="font-size:.72rem;color:var(--text-muted);">5 seats available for occasional visitors</span>
+        </div>
+      </div>
+      <div class="p-seat-bar-wrap">
+        <div class="p-seat-bar-track"><div class="p-seat-bar-fill" style="width:72%;background:var(--pacific);"></div></div>
+        <div class="p-seat-bar-lbl"><span>13 fixed / 18 seats</span><span style="color:var(--pacific)">5 open</span></div>
+      </div>
+    </div>
+
+    <!-- THURSDAY -->
+    <div class="p-day-card">
+      <div class="p-day-hdr">
+        <div class="p-day-name">Thursday</div>
+        <div class="p-day-type">Group B</div>
+        <span class="p-day-tag tag-groupb">13 fixed · 5 open</span>
+      </div>
+      <div class="p-day-divider"></div>
+      <div class="p-day-body">
+        <div class="p-people-group">
+          <div class="p-group-label">Pod 2</div>
+          <span class="p-person-pill"><span class="dot dot-pacific"></span>Angelo</span>
+          <span class="p-person-pill"><span class="dot dot-pacific"></span>Vytor</span>
+          <span class="p-person-pill"><span class="dot dot-pacific"></span>João Victor</span>
+        </div>
+        <div class="p-people-group">
+          <div class="p-group-label">Pod 3</div>
+          <span class="p-person-pill"><span class="dot dot-green"></span>Vitor N.</span>
+          <span class="p-person-pill"><span class="dot dot-green"></span>Mathias</span>
+          <span class="p-person-pill"><span class="dot dot-green"></span>Bruno</span>
+        </div>
+        <div class="p-people-group">
+          <div class="p-group-label">Distributed</div>
+          <span class="p-person-pill"><span class="dot dot-muted"></span>Leticia</span>
+          <span class="p-person-pill"><span class="dot dot-muted"></span>William F.</span>
+          <span class="p-person-pill"><span class="dot dot-muted"></span>Sales Mgr</span>
+          <span class="p-person-pill"><span class="dot dot-muted"></span>Guga</span>
+        </div>
+        <div class="p-people-group">
+          <div class="p-group-label" style="color:var(--green);">Visitors (open)</div>
+          <span style="font-size:.72rem;color:var(--text-muted);">5 seats available — most flexibility</span>
+        </div>
+      </div>
+      <div class="p-seat-bar-wrap">
+        <div class="p-seat-bar-track"><div class="p-seat-bar-fill" style="width:72%;background:var(--green);"></div></div>
+        <div class="p-seat-bar-lbl"><span>13 fixed / 18 seats</span><span style="color:var(--green)">5 open</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- GAINS -->
+<div class="section" style="border-bottom:none;">
+  <div class="section-label">Why this works for the team</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+    <div style="background:var(--black-2);border:1px solid var(--gold-border);border-radius:12px;padding:24px;">
+      <div style="font-size:1.4rem;margin-bottom:12px;">🪑</div>
+      <div style="font-size:.92rem;font-weight:700;color:var(--gold);margin-bottom:8px;">No more uncertainty</div>
+      <div style="font-size:.82rem;color:var(--text-secondary);line-height:1.65;">Everyone knows exactly when they go in and their seat is guaranteed. No more wondering if there'll be space — or finding visitors in your spot.</div>
+    </div>
+    <div style="background:var(--black-2);border:1px solid var(--gold-border);border-radius:12px;padding:24px;">
+      <div style="font-size:1.4rem;margin-bottom:12px;">🌎</div>
+      <div style="font-size:.92rem;font-weight:700;color:var(--gold);margin-bottom:8px;">Aligned with Colombia &amp; Mexico</div>
+      <div style="font-size:.82rem;color:var(--text-secondary);line-height:1.65;">2 days in the office is already the standard for our other offices. Brazil aligns with the same rhythm — one consistent culture across the region.</div>
+    </div>
+    <div style="background:var(--black-2);border:1px solid var(--gold-border);border-radius:12px;padding:24px;">
+      <div style="font-size:1.4rem;margin-bottom:12px;">📈</div>
+      <div style="font-size:.92rem;font-weight:700;color:var(--gold);margin-bottom:8px;">Easier to hire &amp; grow</div>
+      <div style="font-size:.82rem;color:var(--text-secondary);line-height:1.65;">The rotation builds in room for new hires. As the team grows, we still have space — and the structure is easy to adjust without starting from scratch.</div>
+    </div>
+  </div>
+</div>
+
+<div class="p-footer">
+  <strong>JEEVES</strong> &nbsp;·&nbsp; Office Rotation Proposal &nbsp;·&nbsp; Sales Team &nbsp;·&nbsp; May 2026
+</div>
+
+</div><!-- /tab-proposal -->
+
+
+<!-- ══════════════════════════════════════════
+     TAB 2 — RESERVATION APP
+══════════════════════════════════════════ -->
+<div id="tab-app" class="tab-panel">
+<div class="app-wrap">
+
+  <!-- Reserve card -->
+  <div class="res-card">
+    <div class="app-section-title">📌 Reserve a Seat</div>
+    <div class="cal-outer">
+
+      <!-- Calendar -->
+      <div>
+        <div class="mini-cal">
+          <div class="cal-header">
+            <button onclick="calShift(-1)">‹</button>
+            <span id="cal-month-label"></span>
+            <button onclick="calShift(1)">›</button>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+        </div>
+        <div class="sel-date-label" id="sel-date-label">Select a day to reserve</div>
+      </div>
+
+      <!-- Form -->
+      <div class="form-side">
+        <div class="slot-info" id="slot-info">← Pick a day on the calendar</div>
+        <div class="form-grp">
+          <label>Your name</label>
+          <input type="text" id="inp-name" placeholder="e.g. Fernanda"/>
+        </div>
+        <div class="form-grp">
+          <label>Role / Team</label>
+          <input type="text" id="inp-role" placeholder="e.g. Finance"/>
+        </div>
+        <button class="btn-res" id="btn-res" onclick="addReservation()" disabled>Reserve →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Week view -->
+  <div class="week-nav">
+    <button onclick="shiftWeek(-1)">← Prev</button>
+    <span class="week-label" id="week-label"></span>
+    <button onclick="shiftWeek(1)">Next →</button>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> Pod 1</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--pacific)"></div> Pod 2</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Pod 3</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Pod 4</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--powder)"></div> KAMs</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--text-muted)"></div> Distributed</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7C3AED"></div> Visitor</div>
+  </div>
+
+  <div class="days-grid">
+    <div class="r-day-card" id="card-mon"></div>
+    <div class="r-day-card" id="card-tue"></div>
+    <div class="r-day-card" id="card-wed"></div>
+    <div class="r-day-card" id="card-thu"></div>
+  </div>
+
+</div>
+</div><!-- /tab-app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Tab switching ──────────────────────────────────────────────────────────────
+function switchTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.textContent.toLowerCase().includes(id === 'proposal' ? 'proposal' : 'reserve')) {
+      b.classList.add('active');
+    }
+  });
+  window.scrollTo(0, 0);
+}
+
+// ── Schedule data ──────────────────────────────────────────────────────────────
+const TOTAL = 18;
+
+const FIXED = {
+  mon: [],
+  tue: [
+    { name:"Mauricio Peixoto",       role:"AE",            group:"Pod 1",       av:"av-gold"   },
+    { name:"Jorge Marcon",           role:"Stablecoin AE", group:"Pod 1",       av:"av-gold"   },
+    { name:"Nathalia Moura",         role:"SDR",           group:"Pod 1",       av:"av-gold"   },
+    { name:"Angelo Piscitelli",      role:"AE",            group:"Pod 2",       av:"av-pacific" },
+    { name:"Vytor Zeidan",           role:"AE",            group:"Pod 2",       av:"av-pacific" },
+    { name:"João Victor Nascimento", role:"SDR",           group:"Pod 2",       av:"av-pacific" },
+    { name:"Vitor Nuticelli",        role:"AE",            group:"Pod 3",       av:"av-green"  },
+    { name:"Mathias Ferraz",         role:"AE",            group:"Pod 3",       av:"av-green"  },
+    { name:"Bruno Meliani",          role:"SDR",           group:"Pod 3",       av:"av-green"  },
+    { name:"Liana Alves",            role:"AE",            group:"Pod 4",       av:"av-amber"  },
+    { name:"To be hired",            role:"AE",            group:"Pod 4",       av:"av-amber"  },
+    { name:"Willian Andrade",        role:"SDR",           group:"Pod 4",       av:"av-amber"  },
+    { name:"Igor Rodrigues",         role:"KAM",           group:"KAMs",        av:"av-powder" },
+    { name:"Vinicius Gil Fernandes", role:"KAM",           group:"KAMs",        av:"av-powder" },
+    { name:"Gustavo Monsanto",       role:"KAM",           group:"KAMs",        av:"av-powder" },
+    { name:"Sales Manager",          role:"Sales Manager", group:"Distributed", av:"av-muted"  },
+    { name:"Guga",                   role:"GM",            group:"Distributed", av:"av-muted"  },
+  ],
+  wed: [
+    { name:"Mauricio Peixoto",       role:"AE",            group:"Pod 1",       av:"av-gold"   },
+    { name:"Jorge Marcon",           role:"Stablecoin AE", group:"Pod 1",       av:"av-gold"   },
+    { name:"Nathalia Moura",         role:"SDR",           group:"Pod 1",       av:"av-gold"   },
+    { name:"Liana Alves",            role:"AE",            group:"Pod 4",       av:"av-amber"  },
+    { name:"To be hired",            role:"AE",            group:"Pod 4",       av:"av-amber"  },
+    { name:"Willian Andrade",        role:"SDR",           group:"Pod 4",       av:"av-amber"  },
+    { name:"Igor Rodrigues",         role:"KAM",           group:"KAMs",        av:"av-powder" },
+    { name:"Vinicius Gil Fernandes", role:"KAM",           group:"KAMs",        av:"av-powder" },
+    { name:"Gustavo Monsanto",       role:"KAM",           group:"KAMs",        av:"av-powder" },
+    { name:"Leticia Doniak",         role:"SOA",           group:"Distributed", av:"av-muted"  },
+    { name:"William Filho",          role:"Finance",       group:"Distributed", av:"av-muted"  },
+    { name:"Sales Manager",          role:"Sales Manager", group:"Distributed", av:"av-muted"  },
+    { name:"Guga",                   role:"GM",            group:"Distributed", av:"av-muted"  },
+  ],
+  thu: [
+    { name:"Angelo Piscitelli",      role:"AE",            group:"Pod 2",       av:"av-pacific" },
+    { name:"Vytor Zeidan",           role:"AE",            group:"Pod 2",       av:"av-pacific" },
+    { name:"João Victor Nascimento", role:"SDR",           group:"Pod 2",       av:"av-pacific" },
+    { name:"Vitor Nuticelli",        role:"AE",            group:"Pod 3",       av:"av-green"  },
+    { name:"Mathias Ferraz",         role:"AE",            group:"Pod 3",       av:"av-green"  },
+    { name:"Bruno Meliani",          role:"SDR",           group:"Pod 3",       av:"av-green"  },
+    { name:"Leticia Doniak",         role:"SOA",           group:"Distributed", av:"av-muted"  },
+    { name:"William Filho",          role:"Finance",       group:"Distributed", av:"av-muted"  },
+    { name:"Sales Manager",          role:"Sales Manager", group:"Distributed", av:"av-muted"  },
+    { name:"Guga",                   role:"GM",            group:"Distributed", av:"av-muted"  },
+  ],
+};
+
+const DAY_KEYS = ["mon","tue","wed","thu"];
+const DAY_META = {
+  mon: { label:"Monday",    short:"Mon", hdrCls:"hdr-remote", group:"Remote — No office" },
+  tue: { label:"Tuesday",   short:"Tue", hdrCls:"hdr-ab",     group:"Sales All-Hands ⭐" },
+  wed: { label:"Wednesday", short:"Wed", hdrCls:"hdr-a",      group:"Group A+B"          },
+  thu: { label:"Thursday",  short:"Thu", hdrCls:"hdr-b",      group:"Group B"            },
+};
+
+// reservations by date ISO string
+let reservations = {};
+try { reservations = JSON.parse(localStorage.getItem("jeeves_res3") || "{}"); } catch(e){}
+function saveAll() { try { localStorage.setItem("jeeves_res3", JSON.stringify(reservations)); } catch(e){} }
+function getRes(iso) { return reservations[iso] || []; }
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+let weekOffset = 0;
+
+function getMonday(offset) {
+  const d = new Date(); d.setHours(0,0,0,0);
+  const diff = (d.getDay() === 0 ? -6 : 1 - d.getDay());
+  d.setDate(d.getDate() + diff + offset * 7);
+  return d;
+}
+
+function dateForDay(dk, offset) {
+  const mon = getMonday(offset);
+  const idx = { mon:0, tue:1, wed:2, thu:3 };
+  const d = new Date(mon);
+  d.setDate(d.getDate() + idx[dk]);
+  return d;
+}
+
+function fmtDate(d) { return d.toLocaleDateString("en-US", { month:"short", day:"numeric" }); }
+function toISO(d)   { return d.toISOString().slice(0,10); }
+
+function dayKeyFromDate(d) {
+  return ["","mon","tue","wed","thu","",""][d.getDay()] || null;
+}
+
+function initials(name) {
+  return name.split(" ").slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
+}
+
+// ── Calendar ───────────────────────────────────────────────────────────────────
+let calYear, calMonth, selectedDateISO = null;
+
+function initCal() {
+  const now = new Date();
+  calYear = now.getFullYear(); calMonth = now.getMonth();
+}
+
+function calShift(dir) {
+  calMonth += dir;
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0;  calYear++; }
+  renderCal();
+}
+
+function renderCal() {
+  document.getElementById("cal-month-label").textContent =
+    new Date(calYear, calMonth, 1).toLocaleDateString("en-US", { month:"long", year:"numeric" });
+
+  const grid = document.getElementById("cal-grid");
+  grid.innerHTML = "";
+  ["Su","Mo","Tu","We","Th","Fr","Sa"].forEach(d => {
+    const el = document.createElement("div");
+    el.className = "cal-dow"; el.textContent = d; grid.appendChild(el);
+  });
+
+  const first = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  for (let i = 0; i < first; i++) {
+    const el = document.createElement("div"); el.className = "cal-day cal-empty"; grid.appendChild(el);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(calYear, calMonth, day);
+    const dow = d.getDay();
+    const iso = toISO(d);
+    const dk  = dayKeyFromDate(d);
+    const isPast = d < today;
+    const isOff = dow === 0 || dow === 5 || dow === 6; // Sun, Fri, Sat
+
+    const el = document.createElement("div");
+    el.textContent = day;
+
+    if (isOff || isPast || !dk) {
+      el.className = "cal-day cal-disabled";
+    } else {
+      const fixed = (FIXED[dk]||[]).length;
+      const res   = getRes(iso).length;
+      const open  = TOTAL - fixed - res;
+      let cls = "cal-day";
+      if (toISO(today) === iso) cls += " cal-today";
+      if (iso === selectedDateISO) cls += " cal-selected";
+      if (open <= 0) cls += " cal-full cal-has-slot";
+      else if (fixed + res > 0) cls += " cal-has-slot";
+      el.className = cls;
+      el.onclick = () => selectDate(iso, d, dk);
+    }
+    grid.appendChild(el);
+  }
+}
+
+function selectDate(iso, dateObj, dk) {
+  selectedDateISO = iso;
+  renderCal();
+
+  const fixed = (FIXED[dk]||[]).length;
+  const res   = getRes(iso).length;
+  const open  = TOTAL - fixed - res;
+  const meta  = DAY_META[dk];
+
+  document.getElementById("sel-date-label").textContent =
+    dateObj.toLocaleDateString("en-US", { weekday:"long", month:"long", day:"numeric", year:"numeric" });
+
+  const info = document.getElementById("slot-info");
+  // Tuesday: no visitor reservations
+  if (dk === "tue") {
+    info.className = "slot-info full";
+    info.textContent = "🚫 Tuesday is Sales All-Hands day. No visitor reservations.";
+    document.getElementById("btn-res").disabled = true;
+  } else if (dk === "mon") {
+    info.className = "slot-info";
+    info.textContent = "Monday is a remote day — no office.";
+    document.getElementById("btn-res").disabled = true;
+  } else if (open <= 0) {
+    info.className = "slot-info full";
+    info.textContent = `🔴 No seats available on ${meta.label}. All ${TOTAL} seats taken.`;
+    document.getElementById("btn-res").disabled = true;
+  } else {
+    info.className = "slot-info good";
+    info.textContent = `✅ ${open} open seat${open!==1?"s":""} on ${meta.label} (${meta.group})`;
+    document.getElementById("btn-res").disabled = false;
+  }
+
+  DAY_KEYS.forEach(k => document.getElementById(`card-${k}`)?.classList.remove("highlighted"));
+  const cardDate = dateForDay(dk, weekOffset);
+  if (toISO(cardDate) === iso) document.getElementById(`card-${dk}`)?.classList.add("highlighted");
+}
+
+function addReservation() {
+  const name = document.getElementById("inp-name").value.trim();
+  const role = document.getElementById("inp-role").value.trim();
+  if (!name)            { showToast("Please enter your name.", true); return; }
+  if (!selectedDateISO) { showToast("Please select a day.", true); return; }
+
+  const d  = new Date(selectedDateISO + "T12:00:00");
+  const dk = dayKeyFromDate(d);
+  if (dk === "tue" || dk === "mon") { showToast("This day doesn't accept visitor reservations.", true); return; }
+
+  const fixed = (FIXED[dk]||[]).length;
+  const res   = getRes(selectedDateISO);
+  if (fixed + res.length >= TOTAL) { showToast("No seats left that day!", true); return; }
+  if (res.find(r => r.name.toLowerCase() === name.toLowerCase())) {
+    showToast("You already have a reservation that day!", true); return;
+  }
+
+  res.push({ name, role: role||"—", id: Date.now() });
+  reservations[selectedDateISO] = res;
+  saveAll();
+
+  document.getElementById("inp-name").value = "";
+  document.getElementById("inp-role").value = "";
+  const lbl = d.toLocaleDateString("en-US", { weekday:"long", month:"short", day:"numeric" });
+  showToast(`✅ Seat reserved for ${name} — ${lbl}`);
+  renderCal(); renderWeek();
+  selectDate(selectedDateISO, d, dk);
+}
+
+function cancelReservation(dateISO, id) {
+  reservations[dateISO] = (reservations[dateISO]||[]).filter(r => r.id !== id);
+  saveAll();
+  showToast("Reservation cancelled.");
+  renderCal(); renderWeek();
+  if (selectedDateISO === dateISO) {
+    const d = new Date(dateISO + "T12:00:00");
+    selectDate(dateISO, d, dayKeyFromDate(d));
+  }
+}
+
+// ── Week render ────────────────────────────────────────────────────────────────
+function shiftWeek(dir) { weekOffset += dir; renderWeek(); }
+
+function barColor(pct) {
+  if (pct < 0.6)  return "var(--pacific)";
+  if (pct < 0.85) return "var(--amber)";
+  return "var(--red)";
+}
+
+function renderWeek() {
+  const mon = getMonday(weekOffset);
+  const thu = new Date(mon); thu.setDate(thu.getDate()+3);
+  document.getElementById("week-label").textContent =
+    `Week of ${fmtDate(mon)} – ${fmtDate(thu)}`;
+
+  DAY_KEYS.forEach(dk => {
+    const meta    = DAY_META[dk];
+    const dateObj = dateForDay(dk, weekOffset);
+    const dateISO = toISO(dateObj);
+    const fixed   = FIXED[dk] || [];
+    const res     = getRes(dateISO);
+    const total   = fixed.length + res.length;
+    const open    = TOTAL - total;
+    const pct     = total / TOTAL;
+    const card    = document.getElementById(`card-${dk}`);
+    const dateStr = dateObj.toLocaleDateString("en-US", { month:"short", day:"numeric" });
+
+    const sections = {};
+    fixed.forEach(p => {
+      if (!sections[p.group]) sections[p.group] = [];
+      sections[p.group].push(p);
+    });
+
+    let html = `
+      <div class="r-day-hdr ${meta.hdrCls}">
+        <h2>${meta.label}</h2>
+        <span class="r-dtag">${meta.group}</span>
+      </div>
+      <div class="r-date-sub">
+        <span>${dateStr}</span>
+        <span>${dk === 'mon' ? 'Remote' : open + ' open'}</span>
+      </div>
+      <div class="r-seat-bar">
+        <div class="r-seat-bar-track">
+          <div class="r-seat-bar-fill" style="width:${Math.round(pct*100)}%;background:${barColor(pct)}"></div>
+        </div>
+        <div class="r-seat-bar-label">${open} of ${TOTAL} seats available</div>
+      </div>
+      <div class="r-people-list">`;
+
+    Object.entries(sections).forEach(([grp, people]) => {
+      html += `<div class="r-section-lbl">${grp}</div>`;
+      people.forEach(p => {
+        html += `<div class="r-person-chip">
+          <div class="r-avatar ${p.av}">${initials(p.name)}</div>
+          <span class="r-person-name">${p.name}</span>
+          <span class="r-role-badge">${p.role}</span>
+        </div>`;
+      });
+    });
+
+    if (res.length > 0) {
+      html += `<div class="r-section-lbl">Visitor Reservations</div>`;
+      res.forEach(r => {
+        html += `<div class="res-chip">
+          <div class="r-avatar av-purple">${initials(r.name)}</div>
+          <span class="r-person-name" style="color:var(--text-secondary)">${r.name}</span>
+          <span class="r-role-badge">${r.role}</span>
+          <button class="cancel-btn" onclick="cancelReservation('${dateISO}',${r.id})" title="Cancel">✕</button>
+        </div>`;
+      });
+    } else if (dk !== 'mon') {
+      html += `<div class="empty-res">No visitor reservations yet</div>`;
+    }
+
+    html += `</div>`;
+    card.innerHTML = html;
+    if (dateISO === selectedDateISO) card.classList.add("highlighted");
+    else card.classList.remove("highlighted");
+  });
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, isErr=false) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (isErr ? " err" : "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = "toast", 3000);
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+initCal(); renderCal(); renderWeek();
+</script>
+</body>
+</html>
